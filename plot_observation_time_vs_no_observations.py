@@ -1,8 +1,6 @@
-from astropy.io import fits
 from astropy.table import Table
 import matplotlib.pyplot as plt
 import numpy as np
-import csv
 
 plt.rc("text", usetex=True)
 plt.rc("font", family="serif", size=12)
