@@ -41,3 +41,4 @@ with open("ids_10_data_points.txt", "w", newline="") as f:
     writer = csv.writer(f)
     writer.writerow(["objID"])
     writer.writerows(more_than_10_datapoints)
+print("hello")
