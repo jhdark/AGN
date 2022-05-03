@@ -10,56 +10,24 @@ maintable = Table.read(
 
 # maintable.write("COSMOS_PSdetection_filter2.csv", format="ascii.csv", overwrite=True)
 
-data_5_points = np.genfromtxt("ids_5_data_points.txt", delimiter=",", names=True)
-data_10_points = np.genfromtxt("ids_10_data_points.csv", names=True)
-
-data_5 = data_5_points["objID"]
-data_10 = data_5_points["objID"]
-
 # retrive object ids with more than 5/10 datapoints
-id_list = np.unique(np.array(maintable["objID"]))
 obj_IDS = np.array(maintable["objID"])
-more_than_5_datapoints = []
-more_than_10_datapoints = []
+unique_ids, counts = np.unique(obj_IDS, return_counts=True)
+more_than_5_datapoints = unique_ids[np.where(counts >= 5)]
+more_than_10_datapoints = unique_ids[np.where(counts >= 10)]
 
-# m = len(id_list)
-# for unique_id in id_list:
-#     m -= 1
-#     n = 0
-#     for id in obj_IDS:
-#         if id == unique_id:
-#             n += 1
-#     if n > 4:
-#         more_than_5_datapoints.append([unique_id])
-#         if n > 9:
-#             more_than_10_datapoints.append([unique_id])
-#     obj_IDS = np.delete(obj_IDS, np.where(obj_IDS == unique_id))
-#     print(m)
-# print("Number of id's with more than 5 data points: ", len(more_than_5_datapoints))
-# print("writing data 5 points")
-# with open("ids_5_data_points.csv", "w", newline="") as f:
-#     writer = csv.writer(f)
-#     writer.writerow(["objID"])
-#     writer.writerows(more_than_5_datapoints)
-# print("Number of id's with more than 10 data points: ", len(more_than_10_datapoints))
-# print("writing data 10 points")
-# with open("ids_10_data_points.csv", "w", newline="") as f:
-#     writer = csv.writer(f)
-#     writer.writerow(["objID"])
-#     writer.writerows(more_than_10_datapoints)
-
+# plot
 rms = []
 avg_mags = []
 m_r = 1
 F_r = 1
-m = len(data_5)
-for unique_id in data_5:
+m = len(more_than_5_datapoints)
+for unique_id in more_than_5_datapoints:
     m -= 1
     row_data = []
     for row in np.array(maintable):
         if row[0] == unique_id:
             row_data.append(row[11])
-            maintable.remove_row(0)
     # avg mags
     magnitudes = []
     for i in row_data:
