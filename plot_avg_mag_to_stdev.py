@@ -21,13 +21,17 @@ rms = []
 avg_mags = []
 m_r = 1
 F_r = 1
-m = len(more_than_5_datapoints)
-for unique_id in more_than_5_datapoints:
+m = len(more_than_10_datapoints)
+
+maintable = np.array(maintable)
+
+for unique_id in more_than_10_datapoints:
     m -= 1
     row_data = []
-    for row in np.array(maintable):
+    for row in maintable:
         if row[0] == unique_id:
             row_data.append(row[11])
+    np.delete(maintable, np.where(row[0] == unique_id))
     # avg mags
     magnitudes = []
     for i in row_data:
