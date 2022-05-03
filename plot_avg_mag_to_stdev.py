@@ -23,41 +23,35 @@ m_r = 1
 F_r = 1
 m = len(more_than_10_datapoints)
 
-maintable = np.array(maintable)
+maintable_structured = np.lib.recfunctions.structured_to_unstructured(
+    maintable.as_array()
+)
 
 for unique_id in more_than_10_datapoints:
     m -= 1
-    row_data = []
-    for row in maintable:
-        if row[0] == unique_id:
-            row_data.append(row[11])
-    np.delete(maintable, np.where(row[0] == unique_id))
+    data = maintable_structured[np.where(maintable_structured[:, 0] == unique_id)]
     # avg mags
     magnitudes = []
-    for i in row_data:
-        flux_value = i
-        magnitude = -2.5 * np.log10(flux_value / F_r) + m_r
-        magnitudes.append(magnitude)
+    flux_values = data[:, 11]
+    # this seems to only slow it down?
+    # np.delete(maintable_structured, np.where(maintable_structured[:, 0] == unique_id))
+    magnitudes = -2.5 * np.log10(flux_values / F_r) + m_r
     average_mag = np.mean(magnitudes)
     avg_mags.append(average_mag)
-
     # rms
-    diffs = []
-    for mag in magnitudes:
-        diff = mag - average_mag
-        diffs.append(diff)
+    diffs = magnitudes - average_mag
     rms.append(np.mean(np.array(diffs)))
-    print(m)
+    print(m, "datapoints to go")
 
 print(avg_mags)
 print(rms)
 plt.figure()
-plt.scatter(np.array(avg_mags), np.array(rms))
+plt.scatter(np.array(avg_mags), np.array(rms), marker=".")
 
-data = zip(avg_mags, rms)
-with open("plotting_data.csv", "w", newline="") as f:
-    writer = csv.writer(f)
-    writer.writerow(["avg_mags"], ["rms"])
-    writer.writerows(data)
+# data = zip(avg_mags, rms)
+# with open("plotting_data.csv", "w", newline="") as f:
+#     writer = csv.writer(f)
+#     writer.writerow(["avg_mags"], ["rms"])
+#     writer.writerows(data)
 
 plt.show()
