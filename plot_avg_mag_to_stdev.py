@@ -1,4 +1,3 @@
-import os.path
 from astropy.table import Table
 import matplotlib.pyplot as plt
 import numpy as np
@@ -7,33 +6,33 @@ import csv
 plt.rc("text", usetex=True)
 plt.rc("font", family="serif", size=12)
 
-maintable = Table.read(
-    "COSMOS_PSdetection_filter2.fits", format="fits"
-)  # Reads in the table directly from the .fits file
-
-# maintable.write("COSMOS_PSdetection_filter2.csv", format="ascii.csv", overwrite=True)
-
-# maintable numpy conversion
-maintable_structured = np.lib.recfunctions.structured_to_unstructured(
-    maintable.as_array()
-)
-
-# retrive object ids with more than 5/10 datapoints
-obj_IDS = np.array(maintable["objID"])
-unique_ids, counts = np.unique(obj_IDS, return_counts=True)
-more_than_5_datapoints = unique_ids[np.where(counts >= 5)]
-more_than_10_datapoints = unique_ids[np.where(counts >= 10)]
-
-# magnitude evaulation factors
-m_r = 1
-F_r = 1
-
 
 def plot_data():
+    maintable = Table.read(
+        "COSMOS_PSdetection_filter2.fits", format="fits"
+    )  # Reads in the table directly from the .fits file
+
+    # maintable.write("COSMOS_PSdetection_filter2.csv", format="ascii.csv", overwrite=True)
+
+    # maintable numpy conversion
+    maintable_structured = np.lib.recfunctions.structured_to_unstructured(
+        maintable.as_array()
+    )
+
+    # retrive object ids with more than a define number datapoints
+    obj_IDS = np.array(maintable["objID"])
+    unique_ids, counts = np.unique(obj_IDS, return_counts=True)
+    min_data_points = 10
+    datapoint_data = unique_ids[np.where(counts >= min_data_points)]
+
+    # magnitude evaulation factors
+    m_r = 1
+    F_r = 1
+
     mag_rms = []
     avg_mags = []
-    n = len(more_than_10_datapoints)
-    for unique_id in more_than_10_datapoints:
+    n = len(datapoint_data)
+    for unique_id in datapoint_data:
         n -= 1
         data = maintable_structured[np.where(maintable_structured[:, 0] == unique_id)]
         # avg mags
@@ -47,6 +46,15 @@ def plot_data():
         rms = (np.mean(np.array(diffs))) ** 0.5
         mag_rms.append(rms)
         print(n, "datapoints to go")
+
+    # export data
+    data = zip(avg_mags, mag_rms)
+    header = ["avg_mags", "mag_rms"]
+    with open("plotting_data.csv", "w", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow(header)
+        writer.writerows(data)
+
     return mag_rms, avg_mags
 
 
@@ -57,8 +65,8 @@ def plot_data_from_file():
     return mag_rms, avg_mags
 
 
-plot_data()
-# plot_data_from_file()
+# mag_rms, avg_mags = plot_data()
+mag_rms, avg_mags = plot_data_from_file()
 
 plt.figure()
 plt.scatter(np.array(avg_mags), np.array(mag_rms), marker=".", color="black", s=1)
@@ -69,12 +77,5 @@ plt.ylabel("r.m.s deviation (mag)")
 ax = plt.gca()
 ax.spines["right"].set_visible(False)
 ax.spines["top"].set_visible(False)
-
-data = zip(avg_mags, mag_rms)
-header = ["avg_mags", "mag_rms"]
-with open("plotting_data.csv", "w", newline="") as f:
-    writer = csv.writer(f)
-    writer.writerow(header)
-    writer.writerows(data)
 
 plt.show()
