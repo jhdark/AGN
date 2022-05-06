@@ -25,10 +25,6 @@ def plot_data():
     min_data_points = 10
     datapoint_data = unique_ids[np.where(counts >= min_data_points)]
 
-    # magnitude evaulation factors
-    m_r = 1
-    F_r = 1
-
     mag_rms = []
     avg_mags = []
     n = len(datapoint_data)
@@ -38,7 +34,7 @@ def plot_data():
         # avg mags
         magnitudes = []
         flux_values = data[:, 11]
-        magnitudes = -2.5 * np.log10(flux_values / F_r) + m_r
+        magnitudes = -2.5 * np.log10(flux_values / 3631)
         average_mag = np.mean(magnitudes)
         avg_mags.append(average_mag)
         # rms
@@ -48,8 +44,8 @@ def plot_data():
         print(n, "datapoints to go")
 
     # export data
-    data = zip(avg_mags, mag_rms)
-    header = ["avg_mags", "mag_rms"]
+    data = zip(datapoint_data, avg_mags, mag_rms)
+    header = ["objID", "avg_mags", "mag_rms"]
     with open("plotting_data.csv", "w", newline="") as f:
         writer = csv.writer(f)
         writer.writerow(header)
@@ -68,10 +64,11 @@ def plot_data_from_file():
 # mag_rms, avg_mags = plot_data()
 mag_rms, avg_mags = plot_data_from_file()
 
+# rms
 plt.figure()
 plt.scatter(np.array(avg_mags), np.array(mag_rms), marker=".", color="black", s=1)
-plt.xlim(0, 16)
-plt.ylim(bottom=0)
+plt.xlim(10, 25)
+# plt.ylim(bottom=0)
 plt.xlabel("Average magnitude (mag)")
 plt.ylabel("r.m.s deviation (mag)")
 ax = plt.gca()
