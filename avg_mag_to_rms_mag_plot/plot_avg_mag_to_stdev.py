@@ -25,10 +25,6 @@ def plot_data():
     min_data_points = 10
     datapoint_data = unique_ids[np.where(counts >= min_data_points)]
 
-    # magnitude evaulation factors
-    m_r = 1
-    F_r = 1
-
     mag_rms = []
     avg_mags = []
     n = len(datapoint_data)
@@ -38,7 +34,7 @@ def plot_data():
         # avg mags
         magnitudes = []
         flux_values = data[:, 11]
-        magnitudes = -2.5 * np.log10(flux_values / F_r) + m_r
+        magnitudes = -2.5 * np.log10(flux_values / 3631)
         average_mag = np.mean(magnitudes)
         avg_mags.append(average_mag)
         # rms
