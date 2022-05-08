@@ -64,11 +64,23 @@ def plot_data_from_file():
 # mag_rms, avg_mags = plot_data()
 mag_rms, avg_mags = plot_data_from_file()
 
+# sort the arrays
+inds = avg_mags.argsort()
+mag_rms = mag_rms[inds]
+avg_mags = np.sort(avg_mags)
+
 # rms
 plt.figure()
 plt.scatter(np.array(avg_mags), np.array(mag_rms), marker=".", color="black", s=1)
+
+# compute moving average
+N = 5  # N is the window
+moving_avg = np.convolve(mag_rms, np.ones(N)/N, mode='valid')
+plt.plot(np.array(avg_mags)[N-1:], moving_avg, label="Moving average N = {:.0f}".format(N))
+
 plt.xlim(10, 25)
 # plt.ylim(bottom=0)
+plt.legend()
 plt.xlabel("Average magnitude (mag)")
 plt.ylabel("r.m.s deviation (mag)")
 ax = plt.gca()
