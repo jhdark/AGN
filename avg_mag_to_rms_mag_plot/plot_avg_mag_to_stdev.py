@@ -32,9 +32,57 @@ def plot_data():
         n -= 1
         data = maintable_structured[np.where(maintable_structured[:, 0] == unique_id)]
         # avg mags
-        magnitudes = []
-        flux_values = data[:, 11]
-        magnitudes = -2.5 * np.log10(flux_values / 3631)
+        e_1, e_2, e_3, e_4, e_5, e_6 = [], [], [], [], [], []
+        e_7, e_8, e_9, e_10, e_11 = [], [], [], [], []
+        for row in data:
+            if row[5] >= 55189 and row[5] <= 55196:
+                e_1.append(row[11])
+            elif row[5] >= 55245 and row[5] <= 55252:
+                e_2.append(row[11])
+            elif row[5] >= 55265 and row[5] <= 55272:
+                e_3.append(row[11])
+            elif row[5] >= 55613 and row[5] <= 55620:
+                e_4.append(row[11])
+            elif row[5] >= 55968 and row[5] <= 55975:
+                e_5.append(row[11])
+            elif row[5] >= 55313 and row[5] <= 56320:
+                e_6.append(row[11])
+            elif row[5] >= 56331 and row[5] <= 56338:
+                e_7.append(row[11])
+            elif row[5] >= 56342 and row[5] <= 56349:
+                e_8.append(row[11])
+            elif row[5] >= 56666 and row[5] <= 56673:
+                e_9.append(row[11])
+            elif row[5] >= 56678 and row[5] <= 56685:
+                e_10.append(row[11])
+            elif row[5] >= 57005 and row[5] <= 57012:
+                e_11.append(row[11])
+        e_1_avg = np.mean(e_1)
+        e_2_avg = np.mean(e_2)
+        e_3_avg = np.mean(e_3)
+        e_4_avg = np.mean(e_4)
+        e_5_avg = np.mean(e_5)
+        e_6_avg = np.mean(e_6)
+        e_7_avg = np.mean(e_7)
+        e_8_avg = np.mean(e_8)
+        e_9_avg = np.mean(e_9)
+        e_10_avg = np.mean(e_10)
+        e_11_avg = np.mean(e_11)
+        avg_fluxes = [
+            e_1_avg,
+            e_2_avg,
+            e_3_avg,
+            e_4_avg,
+            e_5_avg,
+            e_6_avg,
+            e_7_avg,
+            e_8_avg,
+            e_9_avg,
+            e_10_avg,
+            e_11_avg,
+        ]
+        avg_fluxes = [x for x in avg_fluxes if np.isnan(x) == False]
+        magnitudes = -2.5 * np.log10(np.array(avg_fluxes) / 3631)
         average_mag = np.mean(magnitudes)
         avg_mags.append(average_mag)
         # rms
@@ -65,22 +113,24 @@ def plot_data_from_file():
 mag_rms, avg_mags = plot_data_from_file()
 
 # sort the arrays
-inds = avg_mags.argsort()
-mag_rms = mag_rms[inds]
-avg_mags = np.sort(avg_mags)
+# inds = avg_mags.argsort()
+# mag_rms = mag_rms[inds]
+# avg_mags = np.sort(avg_mags)
 
 # rms
 plt.figure()
 plt.scatter(np.array(avg_mags), np.array(mag_rms), marker=".", color="black", s=1)
 
 # compute moving average
-N = 5  # N is the window
-moving_avg = np.convolve(mag_rms, np.ones(N)/N, mode='valid')
-plt.plot(np.array(avg_mags)[N-1:], moving_avg, label="Moving average N = {:.0f}".format(N))
+# N = 5  # N is the window
+# moving_avg = np.convolve(mag_rms, np.ones(N) / N, mode="valid")
+# plt.plot(
+#     np.array(avg_mags)[N - 1 :], moving_avg, label="Moving average N = {:.0f}".format(N)
+# )
 
-plt.xlim(10, 25)
-# plt.ylim(bottom=0)
-plt.legend()
+# plt.xlim(10, 25)
+plt.ylim(0, 0.5)
+# plt.legend()
 plt.xlabel("Average magnitude (mag)")
 plt.ylabel("r.m.s deviation (mag)")
 ax = plt.gca()
