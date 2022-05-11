@@ -326,6 +326,7 @@ with open("AGN_candidates.csv", "w", newline="") as f:
     writer.writerow(header)
     writer.writerows(data)
 
+print("Numer of AGN candidates = ", len(agn_candidates))
 
 # rms
 plt.figure()
@@ -339,7 +340,7 @@ plt.plot(x_values, running_avgs, linestyle="dashed", color="red")
 #     np.array(avg_mags)[N - 1 :], moving_avg, label="Moving average N = {:.0f}".format(N)
 # )
 
-plt.xlim(14, 22)
+plt.xlim(15, 22)
 plt.ylim(0, 1)
 plt.xlabel("Average magnitude (mag)")
 plt.ylabel("r.m.s deviation (mag)")
