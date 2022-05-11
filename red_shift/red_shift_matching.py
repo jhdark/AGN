@@ -73,18 +73,20 @@ ra_values, dec_values = find_unique_obj_ra_dec_values()
 
 # plot the coordinate of the objects on the sky
 # plt.figure()
+# plt.legend()
+# plt.xlabel("Ra")
+# plt.ylabel("Dec")
 # plt.title("our dataset")
 # plt.plot(tab1["ra"], tab1["dec"], "k.", markersize=0.1)
 
-# plt.figure()
-# plt.title("redshift catalogue data")
-# plt.plot(tab["RA"], tab["DEC"], "r.", markersize=0.1)
 
 # plt.figure()
+# plt.legend()
+# plt.xlabel("Ra")
+# plt.ylabel("Dec")
 # plt.title("both data")
 # plt.plot(tab["RA"], tab["DEC"], "r.", markersize=0.1, alpha=0.5)
 # plt.plot(tab1["ra"], tab1["dec"], "k.", markersize=0.1)
-
 
 # redshift table already has units for RA, DEC
 
@@ -110,7 +112,7 @@ coords1[index]
 coords2[match[index]]
 
 header = ["Z_BEST", "dist2d"]
-rows = zip(tab["Z_BEST"], dist2d.arcsec)
+rows = zip(tab["Z_BEST"], dist2d.degrees)
 with open("redshift_data.csv", "w", newline="") as f:
     writer = csv.writer(f)
     writer.writerow(header)
@@ -123,7 +125,5 @@ with open("redshift_data.csv", "w", newline="") as f:
 # (index,) = np.where(tab["Z_BEST"] > 0)
 
 # plt.figure()
-# plt.hist(
-#     tab["Z_BEST"][index], bins=100
-# )  # Still contains bad redshift. Another round of filtering to get the subset with good redshifts.
-plt.show()
+# plt.hist(tab["Z_BEST"][index], bins=100)  # Still contains bad redshift. Another round of filtering to get the subset with good redshifts.
+# plt.show()
