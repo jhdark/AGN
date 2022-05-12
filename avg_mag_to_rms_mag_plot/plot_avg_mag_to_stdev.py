@@ -34,7 +34,9 @@ def plot_data():
     mag_rms = []
     avg_mags = []
     n = len(datapoint_data)
-    for unique_id in datapoint_data:
+    ids_for_plot = [109741495416355536]
+    mags_for_plot = []
+    for unique_id in ids_for_plot:
         n -= 1
         data = maintable_structured[np.where(maintable_structured[:, 0] == unique_id)]
         # avg mags
@@ -76,11 +78,15 @@ def plot_data():
             np.mean(e_10),
             np.mean(e_11),
         ]
+        print(avg_fluxes)
         avg_fluxes = [x for x in avg_fluxes if np.isnan(x) == False]
         # print(len(avg_fluxes))
         if len(avg_fluxes) <= 3:
             continue
         magnitudes = -2.5 * np.log10(np.array(avg_fluxes) / 3631)
+        print(magnitudes)
+        quit()
+        mags_for_plot.append(magnitudes)
         average_mag = np.mean(magnitudes)
         avg_mags.append(average_mag)
         # rms
@@ -101,15 +107,15 @@ def plot_data():
 
 
 def plot_data_from_file():
-    data_file = np.genfromtxt("plotting_data.csv", delimiter=",", names=True)
+    data_file = np.genfromtxt("plotting_data_5.csv", delimiter=",", names=True)
     object_id = data_file["objID"]
     avg_mags = data_file["avg_mags"]
     mag_rms = data_file["mag_rms"]
     return object_id, avg_mags, mag_rms
 
 
-# mag_rms, avg_mags = plot_data()
-object_id, avg_mags, mag_rms = plot_data_from_file()
+mag_rms, avg_mags = plot_data()
+# object_id, avg_mags, mag_rms = plot_data_from_file()
 
 dataset = np.array(list(zip(object_id, avg_mags, mag_rms)))
 # remove values where the rms is greater than 5
@@ -306,11 +312,10 @@ for row in b_16:
     if rms_star >= 3:
         agn_candidates.append(row[0])
 
-print(agn_candidates)
-print(len(agn_candidates))
 
 avg_flux_data = []
 n = len(agn_candidates)
+
 for candidate in agn_candidates:
     n -= 1
     data = maintable_structured[np.where(maintable_structured[:, 0] == candidate)]
@@ -332,13 +337,6 @@ print("Numer of AGN candidates = ", len(agn_candidates))
 plt.figure()
 plt.scatter(dataset[:, 1], dataset[:, 2], marker=".", color="black", s=1)
 plt.plot(x_values, running_avgs, linestyle="dashed", color="red")
-
-# compute moving average
-# N = 800  # N is the window
-# moving_avg = np.convolve(mag_rms, np.ones(N) / N, mode="valid")
-# plt.plot(
-#     np.array(avg_mags)[N - 1 :], moving_avg, label="Moving average N = {:.0f}".format(N)
-# )
 
 plt.xlim(15, 22)
 plt.ylim(0, 1)
