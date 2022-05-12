@@ -1,16 +1,16 @@
-from cProfile import label
 from astropy.table import Table
 from astropy.coordinates import SkyCoord
+from astropy.cosmology import WMAP9 as cosmo
 import astropy.units as u
 import matplotlib.pyplot as plt
 import numpy as np
 import csv
 
-plt.rc("text", usetex=True)
-plt.rc("font", family="serif", size=12)
+# plt.rc("text", usetex=True)
+# plt.rc("font", family="serif", size=12)
 
 tab = Table.read("../COSMOS_zcat_forProject.fits", format="fits")  #  redshift table
-tab.colnames
+# print(tab.colnames)
 
 tab["Z_BEST"]  # contains your best estimate of the redshift
 (index,) = np.where(
@@ -71,8 +71,61 @@ def plot_data_from_file():
     return ra_values, dec_values, flux_values
 
 
+def red_shift_data_from_file():
+    tab_rs = np.genfromtxt("redshift_data.csv", delimiter=",", names=True)
+    red_shift_values = tab_rs["red_shift"]
+    dist2d_values = tab_rs["dist2d"]
+    flux_values = tab_rs["flux"]
+
+    return red_shift_values, dist2d_values, flux_values
+
+
 # ra_values, dec_values = find_unique_obj_ra_dec_values()
-ra_values, dec_values, flux_values = plot_data_from_file()
+# ra_values, dec_values, flux_values = plot_data_from_file()
+red_shift_values, dist2d_values, flux_values = red_shift_data_from_file()
+
+table = np.array(list(zip(red_shift_values, dist2d_values, flux_values)))
+print(len(table))
+new_table = []
+for row in table:
+    if row[0] < 0:
+        continue
+    elif row[0] > 8:
+        continue
+    elif row[1] > 0.5:
+        continue
+    else:
+        new_table.append(row)
+
+print("new table size = ", len(new_table))
+
+new_table = np.array(new_table)
+new_red_shift_values = new_table[:, 0]
+new_dist2d_values = new_table[:, 1]
+new_flux_values = new_table[:, 2]
+
+
+lum_distance = cosmo.luminosity_distance(new_red_shift_values)
+luminosity_values = new_flux_values * (4 * np.pi * (lum_distance) ** 2)
+plt.figure()
+plt.scatter(new_red_shift_values, luminosity_values, s=5, marker=".", color="black")
+plt.ylim(0, 0.8e7)
+plt.xlim(left=0)
+plt.xlabel("Redshift")
+plt.ylabel("luminosity")
+plt.show()
+
+quit()
+
+header = ["red_shift", "dist2d", "flux"]
+rows = zip(new_red_shift_values, new_dist2d_values, new_flux_values)
+with open("new_redshift_data.csv", "w", newline="") as f:
+    writer = csv.writer(f)
+    writer.writerow(header)
+    for row in rows:
+        writer.writerow(row)
+
+quit()
 
 
 # plot the coordinate of the objects on the sky
@@ -106,37 +159,47 @@ lgnd = plt.legend(loc="upper right", numpoints=1, fontsize=10)
 lgnd.legendHandles[0]._legmarker.set_markersize(6)
 lgnd.legendHandles[1]._legmarker.set_markersize(6)
 plt.tight_layout()
-plt.show()
-# redshift table already has units for RA, DEC
+# plt.show()
 
-# coords1 = SkyCoord(
-#     tab["RA"], tab["DEC"]
-# )  # redshift table already has units for RA, DEC
-# coords2 = SkyCoord(ra_values, dec_values, unit=u.deg)
+
+# redshift table already has units for RA, DEC
+coords1 = SkyCoord(
+    tab["RA"], tab["DEC"]
+)  # redshift table already has units for RA, DEC
+coords2 = SkyCoord(ra_values, dec_values, unit=u.deg)
 
 # match, dist2d, dist3d = coords1.match_to_catalog_sky(coords2)
-# print(np.array(match))
-# print(dist2d)
-# coords1[0]
-# match[0]
-# coords2[624568]
-# dist2d[0].arcsec
+match, dist2d, dist3d = coords2.match_to_catalog_sky(coords1)
+# print(len(match))
+# print(len(dist2d))
 
 # plt.figure()
 # plt.hist(
 #     dist2d.arcsec, bins=100, range=(0, 3)
 # )  # decided that optimal maximum matching distance is 0.5" for this table
 # (index,) = np.where(dist2d.arcsec < 0.5)
-# coords1[index]
-# coords2[match[index]]
 
-# header = ["Z_BEST", "dist2d"]
-# rows = zip(tab["Z_BEST"], dist2d.degrees)
-# with open("redshift_data.csv", "w", newline="") as f:
-#     writer = csv.writer(f)
-#     writer.writerow(header)
-#     for row in rows:
-#         writer.writerow(row)
+# coords1[index]
+# print(coords2[match[index]])
+# print(match)
+# print(tab["Z_BEST"][match])
+
+
+# (index,) = np.where(dist2d.arcsec < 0.5)
+# (index,) = np.where(tab["Z_BEST"] < 8)
+# (index,) = np.where(tab["Z_BEST"] > 0)
+# print(len(match[index]))
+# print(len(dist2d[index]))
+# print(len(flux_values))
+
+
+header = ["red_shift", "dist2d", "flux"]
+rows = zip(tab["Z_BEST"][match], dist2d.arcsec, flux_values)
+with open("redshift_data.csv", "w", newline="") as f:
+    writer = csv.writer(f)
+    writer.writerow(header)
+    for row in rows:
+        writer.writerow(row)
 
 
 # (index,) = np.where(dist2d.arcsec < 0.5)
