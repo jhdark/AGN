@@ -51,7 +51,7 @@ def plot_data():
                 e_4.append(row[11])
             elif row[5] >= 55968 and row[5] <= 55975:
                 e_5.append(row[11])
-            elif row[5] >= 55313 and row[5] <= 56320:
+            elif row[5] >= 56313 and row[5] <= 56320:
                 e_6.append(row[11])
             elif row[5] >= 56331 and row[5] <= 56338:
                 e_7.append(row[11])
